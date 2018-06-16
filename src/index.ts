@@ -1,33 +1,31 @@
-import { Buffer } from "buffer";
 import * as crypto from "crypto";
+
+import { Buffer } from "buffer";
 
 interface ICipherRaw {
   content: string;
   iv: string;
 }
 
-class EncryptionServiceBase {
-  private algorithm = "aes-128-cbc";
-
-  private getIv() {
+const EncryptionService = (() => {
+  const algorithm = "aes-128-cbc";
+  function getIv() {
     const iv = Buffer.from(crypto.randomBytes(16));
     return iv.toString("hex").slice(0, 16);
   }
-
-  private hashEncPassword(secret: string) {
+  function hashEncPassword(secret: string) {
     return crypto
       .createHash("md5")
       .update(secret.toLowerCase(), "utf8")
       .digest();
   }
-
-  encodeSync(stringData: string, secret: string) {
+  function encodeSync(stringData: string, secret: string) {
     try {
-      const encIv = this.getIv();
+      const encIv = getIv();
       //
-      const key = this.hashEncPassword(secret);
+      const key = hashEncPassword(secret);
       //
-      const cipher = crypto.createCipheriv(this.algorithm, key, encIv);
+      const cipher = crypto.createCipheriv(algorithm, key, encIv);
       let encrypted = cipher.update(stringData, "utf8", "hex");
       encrypted += cipher.final("hex");
       const result: ICipherRaw = {
@@ -41,27 +39,25 @@ class EncryptionServiceBase {
       throw err;
     }
   }
-
-  encode(stringData: string, secret: string) {
+  function encode(stringData: string, secret: string) {
     return new Promise<string>((resolve, reject) => {
       try {
-        const _enc = this.encodeSync(stringData, secret);
+        const _enc = encodeSync(stringData, secret);
         resolve(_enc);
       } catch (e) {
         reject(e);
       }
     });
   }
-
-  decodeSync(encryptedStringData: string, secret: string) {
+  function decodeSync(encryptedStringData: string, secret: string) {
     try {
       //
       const encrypted01 = Buffer.from(encryptedStringData, "base64").toString("utf8");
       const encrypted02: ICipherRaw = JSON.parse(encrypted01);
       //
-      const key = this.hashEncPassword(secret);
+      const key = hashEncPassword(secret);
       //
-      const decipher = crypto.createDecipheriv(this.algorithm, key, encrypted02.iv);
+      const decipher = crypto.createDecipheriv(algorithm, key, encrypted02.iv);
       //
       let dec = decipher.update(encrypted02.content, "hex", "utf8");
       dec += decipher.final("utf8");
@@ -72,20 +68,25 @@ class EncryptionServiceBase {
       throw err;
     }
   }
-
-  decode(stringData: string, secret: string) {
+  function decode(stringData: string, secret: string) {
     return new Promise<string>((resolve, reject) => {
       try {
-        const _decData = this.decodeSync(stringData, secret);
+        const _decData = decodeSync(stringData, secret);
         resolve(_decData);
       } catch (e) {
         reject(e);
       }
     });
   }
-}
-const valueEnc = new EncryptionServiceBase();
-export const decode = valueEnc.decode;
-export const encode = valueEnc.encode;
-export const decodeSync = valueEnc.decodeSync;
-export const encodeSync = valueEnc.encodeSync;
+  return {
+    decode,
+    encode,
+    decodeSync,
+    encodeSync,
+  };
+})();
+
+export const decode = EncryptionService.decode;
+export const encode = EncryptionService.encode;
+export const decodeSync = EncryptionService.decodeSync;
+export const encodeSync = EncryptionService.encodeSync;
