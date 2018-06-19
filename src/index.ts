@@ -20,6 +20,12 @@ const EncryptionService = (() => {
       .digest();
   }
   function encodeSync(stringData: string, secret: string) {
+    if (typeof stringData !== "string") {
+      throw new Error("Invalid input data. Data input MUST be string only.");
+    }
+    if (typeof secret !== "string") {
+      throw new Error("Invalid input secret. MUST be string only.");
+    }
     try {
       const encIv = getIv();
       //
@@ -50,8 +56,14 @@ const EncryptionService = (() => {
     });
   }
   function decodeSync(encryptedStringData: string, secret: string) {
+    //
+    if (typeof encryptedStringData !== "string") {
+      throw new Error("Invalid input data. Data input MUST be string only.");
+    }
+    if (typeof secret !== "string") {
+      throw new Error("Invalid input secret. MUST be string only.");
+    }
     try {
-      //
       const encrypted01 = Buffer.from(encryptedStringData, "base64").toString("utf8");
       const encrypted02: ICipherRaw = JSON.parse(encrypted01);
       //
