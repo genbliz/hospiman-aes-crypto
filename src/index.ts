@@ -1,6 +1,5 @@
-import * as crypto from "crypto";
-
 import { Buffer } from "buffer";
+import * as crypto from "crypto";
 
 interface ICipherRaw {
   content: string;
@@ -40,8 +39,6 @@ const EncryptionService = (() => {
       };
       return Buffer.from(JSON.stringify(result)).toString("base64");
     } catch (err) {
-      console.log("encodeSync ERROR:");
-      console.log(err);
       throw err;
     }
   }
@@ -75,8 +72,6 @@ const EncryptionService = (() => {
       dec += decipher.final("utf8");
       return dec;
     } catch (err) {
-      console.log("decodeSync ERROR:");
-      console.log(err);
       throw err;
     }
   }

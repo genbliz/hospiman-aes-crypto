@@ -15,6 +15,12 @@ var EncryptionService = (function () {
             .digest();
     }
     function encodeSync(stringData, secret) {
+        if (typeof stringData !== "string") {
+            throw new Error("Invalid input data. Data input MUST be string only.");
+        }
+        if (typeof secret !== "string") {
+            throw new Error("Invalid input secret. MUST be string only.");
+        }
         try {
             var encIv = getIv();
             //
@@ -47,8 +53,14 @@ var EncryptionService = (function () {
         });
     }
     function decodeSync(encryptedStringData, secret) {
+        //
+        if (typeof encryptedStringData !== "string") {
+            throw new Error("Invalid input data. Data input MUST be string only.");
+        }
+        if (typeof secret !== "string") {
+            throw new Error("Invalid input secret. MUST be string only.");
+        }
         try {
-            //
             var encrypted01 = buffer_1.Buffer.from(encryptedStringData, "base64").toString("utf8");
             var encrypted02 = JSON.parse(encrypted01);
             //
