@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var crypto = require("crypto");
 var buffer_1 = require("buffer");
+var crypto = require("crypto");
 var EncryptionService = (function () {
     var algorithm = "aes-128-cbc";
     function getIv() {
@@ -36,8 +36,6 @@ var EncryptionService = (function () {
             return buffer_1.Buffer.from(JSON.stringify(result)).toString("base64");
         }
         catch (err) {
-            console.log("encodeSync ERROR:");
-            console.log(err);
             throw err;
         }
     }
@@ -73,8 +71,6 @@ var EncryptionService = (function () {
             return dec;
         }
         catch (err) {
-            console.log("decodeSync ERROR:");
-            console.log(err);
             throw err;
         }
     }
